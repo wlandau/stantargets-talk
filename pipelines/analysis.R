@@ -1,3 +1,4 @@
+# Goal: analyze a simulated dataset and inspect the results.
 library(targets)
 library(stantargets)
 tar_source()

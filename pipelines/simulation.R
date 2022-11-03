@@ -1,3 +1,8 @@
+# Goal: conduct a simulation study to check that the model
+# is implemented correctly in Stan. The pipeline
+# simulates from the prior predictive distribution
+# and assesses the ability of the model to capture the
+# underlying parameter draws in posterior intervals.
 library(targets)
 library(stantargets)
 tar_option_set(packages = "dplyr")
