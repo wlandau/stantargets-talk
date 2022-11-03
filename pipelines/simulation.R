@@ -19,8 +19,8 @@ list(
     reps = 10,
     chains = 4,
     stdout = nullfile(),
-    iter_warmup = 1e3,
-    iter_sampling = 1e3,
+    iter_warmup = 2e3,
+    iter_sampling = 2e3,
     summaries = list(
       ~posterior::quantile2(.x, probs = c(0.025, 0.25, 0.75, 0.975)),
       rhat = posterior::rhat,
@@ -33,21 +33,23 @@ list(
     retrieval = "worker"
   ),
   tar_target(
-    convergence,
-    tibble::tibble(
+    name = convergence,
+    command = tibble::tibble(
       max_rhat = max(analysis_model$rhat, na.rm = TRUE),
       min_ess_bulk = min(analysis_model$ess_bulk, na.rm = TRUE),
       min_ess_tail = min(analysis_model$ess_tail, na.rm = TRUE)
-    )
+    ),
+    deployment = "main"
   ),
   tar_target(
-    coverage,
-    analysis_model %>%
+    name = coverage,
+    command = analysis_model %>%
       filter(grepl("^beta|^sigma|^lambda", variable), !is.na(rhat)) %>%
       group_by(variable) %>%
       summarize(
         coverage_50 = mean(q25 < .join_data & .join_data < q75),
         coverage_95 = mean(q2.5 < .join_data & .join_data < q97.5)
-      )
+      ),
+    deployment = "main"
   )
 )
