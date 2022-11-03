@@ -1,5 +1,6 @@
 _targets.R
 _targets
+stores
 *~
 *.out
 *.Rout
