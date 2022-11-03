@@ -403,8 +403,8 @@ $$
 ## Live demos
 
 * <https://github.com/wlandau/stantargets-talk>
-  * `demo_analysis.R`
-  * `demo_simulation.R`.
+  * [`demo_analysis.R`](https://github.com/wlandau/stantargets-talk/blob/main/demo_analysis.R)
+  * [`demo_simulation.R`](https://github.com/wlandau/stantargets-talk/blob/main/demo_simulation.R).
 
 ## Thanks
 
@@ -414,5 +414,3 @@ $$
 * Contributions from the community:
     * <https://github.com/ropensci/targets/discussions>
     * <https://github.com/ropensci/stantargets/discussions>
-
-## References

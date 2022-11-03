@@ -1,3 +1,8 @@
+# Goal: conduct a simulation study to check that the model
+# is implemented correctly in Stan. The pipeline
+# simulates from the prior predictive distribution
+# and assesses the ability of the model to capture the
+# underlying parameter draws in posterior intervals.
 rstudioapi::restartSession()
 library(targets)
 tar_destroy()
@@ -14,7 +19,9 @@ tar_visnetwork()
 # Run the pipeline with 2 persistent workers.
 tar_make_clustermq(workers = 2)
 
-# Read the coverage results. Is the model well calibrated?
+# Read the coverage results. If the model is implemented correctly,
+# then cover_95 should be about 0.95 on average, and cover_50
+# should be about 0.5 on average.
 tar_read(coverage)
 
 # Read the convergence results.

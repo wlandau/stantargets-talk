@@ -1,3 +1,4 @@
+# Goal: analyze a simulated dataset and inspect the results.
 rstudioapi::restartSession()
 library(targets)
 tar_destroy()
