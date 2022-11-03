@@ -404,9 +404,9 @@
 <center>
 <br>
 <h3>
-Introduction to the <code>targets</code> R package
+Bayesian data analysis pipelines with {stantargets}
 </h3>
-<img src="./images/logo.png" height="400px"> <br>
+<img src="./images/stantargets.png" height="400px"> <br>
 <h4>
 Will Landau
 </h4>
@@ -415,7 +415,7 @@ Will Landau
 <section id="demanding-computation-in-r" class="slide level2 smaller">
 <h2>Demanding computation in R</h2>
 <ul>
-<li><strong>Bayesian data analysis: JAGS, Stan, NIMBLE, <code>greta</code></strong></li>
+<li><strong>Bayesian data analysis: Stan, JAGS, NIMBLE, <code>greta</code></strong></li>
 <li>Deep learning: <code>keras</code>, <code>tensorflow</code>, <code>torch</code></li>
 <li>Machine learning: <code>tidymodels</code></li>
 <li>PK/PD: <code>nlmixr</code>, <code>mrgsolve</code></li>
@@ -887,229 +887,6 @@ Will Landau
 </ol>
 </div>
 </section>
-<section id="literate-programming" class="slide level2 smaller">
-<h2>Literate programming</h2>
-<ul>
-<li><code>tar_quarto()</code> or <code>tar_render()</code> from the <code>tarchetypes</code> package.</li>
-<li>Render a Quarto document/project or R Markdown document as a target in the pipeline.</li>
-<li>Documents rely on upstream targets through <code>tar_read()</code> and <code>tar_load()</code>.
-<ul>
-<li><code>tar_quarto()</code> and <code>tar_render()</code> register upstream targets as dependencies.</li>
-<li>The documents themselves should run quickly and do little to no original computation.</li>
-</ul></li>
-<li>Multiple ways to render the report:
-<ol type="1">
-<li>Option 1: develop it interactively (RStudio IDE, <code>rmarkdown::render()</code>, <code>quarto::quarto_render()</code>.</li>
-<li>Option 2: run the pipeline (e.g.&nbsp;<code>tar_make()</code>) to get reproducible HTML output.</li>
-</ol></li>
-</ul>
-</section>
-<section id="example-report.qmd" class="slide level2">
-<h2>Example <code>report.qmd</code></h2>
-<p><br></p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource default number-lines code-with-copy"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1"></a>---</span>
-<span id="cb14-2"><a href="#cb14-2"></a>title: "Results"</span>
-<span id="cb14-3"><a href="#cb14-3"></a>format: html</span>
-<span id="cb14-4"><a href="#cb14-4"></a>---</span>
-<span id="cb14-5"><a href="#cb14-5"></a></span>
-<span id="cb14-6"><a href="#cb14-6"></a>```{r}</span>
-<span id="cb14-7"><a href="#cb14-7"></a>library(targets)</span>
-<span id="cb14-8"><a href="#cb14-8"></a>tar_read(model)</span>
-<span id="cb14-9"><a href="#cb14-9"></a>tar_load(plot)</span>
-<span id="cb14-10"><a href="#cb14-10"></a>print(plot)</span>
-<span id="cb14-11"><a href="#cb14-11"></a>```</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="in-a-pipeline" class="slide level2 smaller">
-<h2>In a pipeline</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15" data-code-line-numbers="11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># _targets.R file, written by use_targets() and then modified:</span></span>
-<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">library</span>(targets)</span>
-<span id="cb15-3"><a href="#cb15-3"></a><span class="fu">tar_option_set</span>(<span class="at">packages =</span> <span class="fu">c</span>(<span class="st">"dplyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"readr"</span>))</span>
-<span id="cb15-4"><a href="#cb15-4"></a><span class="fu">options</span>(<span class="at">clustermq.scheduler =</span> <span class="st">"multicore"</span>)</span>
-<span id="cb15-5"><a href="#cb15-5"></a><span class="fu">tar_source</span>()</span>
-<span id="cb15-6"><a href="#cb15-6"></a><span class="fu">list</span>(</span>
-<span id="cb15-7"><a href="#cb15-7"></a>  <span class="fu">tar_target</span>(<span class="at">name =</span> file, <span class="at">command =</span> <span class="st">"data.csv"</span>, <span class="at">format =</span> <span class="st">"file"</span>),</span>
-<span id="cb15-8"><a href="#cb15-8"></a>  <span class="fu">tar_target</span>(<span class="at">name =</span> data, <span class="at">command =</span> <span class="fu">get_data</span>(file)),</span>
-<span id="cb15-9"><a href="#cb15-9"></a>  <span class="fu">tar_target</span>(<span class="at">name =</span> model, <span class="at">command =</span> <span class="fu">fit_model</span>(data)),</span>
-<span id="cb15-10"><a href="#cb15-10"></a>  <span class="fu">tar_target</span>(<span class="at">name =</span> plot, <span class="at">command =</span> <span class="fu">plot_model</span>(model, data)),</span>
-<span id="cb15-11"><a href="#cb15-11"></a>  tarchetypes<span class="sc">::</span><span class="fu">tar_quarto</span>(<span class="at">name =</span> report, <span class="at">path =</span> <span class="st">"report.qmd"</span>)</span>
-<span id="cb15-12"><a href="#cb15-12"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="columns">
-<div class="column" style="width:40%;">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="fu">tar_make</span>()</span>
-<span id="cb16-2"><a href="#cb16-2"></a><span class="co">#&gt; ✔ skip target file</span></span>
-<span id="cb16-3"><a href="#cb16-3"></a><span class="co">#&gt; ✔ skip target data</span></span>
-<span id="cb16-4"><a href="#cb16-4"></a><span class="co">#&gt; ✔ skip target model</span></span>
-<span id="cb16-5"><a href="#cb16-5"></a><span class="co">#&gt; ✔ skip target plot</span></span>
-<span id="cb16-6"><a href="#cb16-6"></a><span class="co">#&gt; • start target report</span></span>
-<span id="cb16-7"><a href="#cb16-7"></a><span class="co">#&gt; • built target report</span></span>
-<span id="cb16-8"><a href="#cb16-8"></a><span class="co">#&gt; • end pipeline: 5.758 seconds</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div><div class="column" style="width:60%;">
-<div class="cell" data-reveal="true" data-fig-width="5.5">
-<div class="cell-output-display">
-<div>
-<p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-5">graph LR
-  subgraph legend
-    x7420bd9270f8d27d([""Up to date""]):::uptodate --- x0a52b03877696646([""Outdated""]):::outdated
-    x0a52b03877696646([""Outdated""]):::outdated --- xbf4603d6c2c2ad6b([""Stem""]):::none
-    xbf4603d6c2c2ad6b([""Stem""]):::none --- xf0bce276fe2b9d3e&gt;""Function""]:::none
-  end
-  subgraph Graph
-    xe1eeca7af8e0b529(["model"]):::uptodate --&gt; xe0fba61fbc506510(["report"]):::outdated
-    xaf95534ce5e3f59e(["plot"]):::uptodate --&gt; xe0fba61fbc506510(["report"]):::outdated
-    xb7119b48552d1da3(["data"]):::uptodate --&gt; xaf95534ce5e3f59e(["plot"]):::uptodate
-    xe1eeca7af8e0b529(["model"]):::uptodate --&gt; xaf95534ce5e3f59e(["plot"]):::uptodate
-    x619ade380bedf7c2&gt;"plot_model"]:::uptodate --&gt; xaf95534ce5e3f59e(["plot"]):::uptodate
-    x6d51284275156668(["file"]):::uptodate --&gt; xb7119b48552d1da3(["data"]):::uptodate
-    xd69ee82cddb4d6bb&gt;"get_data"]:::uptodate --&gt; xb7119b48552d1da3(["data"]):::uptodate
-    xb7119b48552d1da3(["data"]):::uptodate --&gt; xe1eeca7af8e0b529(["model"]):::uptodate
-    x9c2a6d6bf64731cc&gt;"fit_model"]:::uptodate --&gt; xe1eeca7af8e0b529(["model"]):::uptodate
-  end
-  classDef uptodate stroke:#000000,color:#ffffff,fill:#354823;
-  classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
-  classDef none stroke:#000000,color:#000000,fill:#94a4ac;
-  linkStyle 0 stroke-width:0px;
-  linkStyle 1 stroke-width:0px;
-  linkStyle 2 stroke-width:0px;
-</pre>
-<div id="mermaid-tooltip-5" class="mermaidTooltip">
-
-</div>
-<p></p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="reproducible-html-report" class="slide level2">
-<h2>Reproducible HTML report</h2>
-
-<img data-src="./images/report.png" class="r-stretch"></section>
-<section id="static-branching" class="slide level2 smaller">
-<h2>Static branching</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17" data-code-line-numbers="8-14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># _targets.R file, written by use_targets() and then modified:</span></span>
-<span id="cb17-2"><a href="#cb17-2"></a><span class="fu">library</span>(targets)</span>
-<span id="cb17-3"><a href="#cb17-3"></a><span class="fu">options</span>(<span class="at">clustermq.scheduler =</span> <span class="st">"multicore"</span>)</span>
-<span id="cb17-4"><a href="#cb17-4"></a><span class="fu">tar_source</span>()</span>
-<span id="cb17-5"><a href="#cb17-5"></a><span class="fu">list</span>(</span>
-<span id="cb17-6"><a href="#cb17-6"></a>  <span class="fu">tar_target</span>(<span class="at">name =</span> file, <span class="at">command =</span> <span class="st">"data.csv"</span>, <span class="at">format =</span> <span class="st">"file"</span>),</span>
-<span id="cb17-7"><a href="#cb17-7"></a>  <span class="fu">tar_target</span>(<span class="at">name =</span> data, <span class="at">command =</span> <span class="fu">get_data</span>(file)),</span>
-<span id="cb17-8"><a href="#cb17-8"></a>  tarchetypes<span class="sc">::</span><span class="fu">tar_map</span>(</span>
-<span id="cb17-9"><a href="#cb17-9"></a>    <span class="fu">tar_target</span>(<span class="at">name =</span> analysis, <span class="at">command =</span> <span class="fu">method</span>(data, tag)),</span>
-<span id="cb17-10"><a href="#cb17-10"></a>    <span class="at">values =</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
-<span id="cb17-11"><a href="#cb17-11"></a>      <span class="at">method =</span> rlang<span class="sc">::</span><span class="fu">syms</span>(<span class="fu">c</span>(<span class="st">"run_keras"</span>, <span class="st">"run_xgboost"</span>)),</span>
-<span id="cb17-12"><a href="#cb17-12"></a>      <span class="at">tag =</span> <span class="fu">c</span>(<span class="st">"tag1"</span>, <span class="st">"tag2"</span>)</span>
-<span id="cb17-13"><a href="#cb17-13"></a>    )</span>
-<span id="cb17-14"><a href="#cb17-14"></a>  )</span>
-<span id="cb17-15"><a href="#cb17-15"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="columns">
-<div class="column" style="width:60%;">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">tar_manifest</span>()</span>
-<span id="cb18-2"><a href="#cb18-2"></a><span class="co">#&gt; # A tibble: 3 × 2</span></span>
-<span id="cb18-3"><a href="#cb18-3"></a><span class="co">#&gt;   name                  command                  </span></span>
-<span id="cb18-4"><a href="#cb18-4"></a><span class="co">#&gt;   &lt;chr&gt;                 &lt;chr&gt;                    </span></span>
-<span id="cb18-5"><a href="#cb18-5"></a><span class="co">#&gt; 1 data                  "get_data()"             </span></span>
-<span id="cb18-6"><a href="#cb18-6"></a><span class="co">#&gt; 2 analysis_xgboost_tag2 "run_xgboost(data, \"tag2\")"</span></span>
-<span id="cb18-7"><a href="#cb18-7"></a><span class="co">#&gt; 3 analysis_keras_tag1   "run_keras(data, \"tag1\")"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div><div class="column" style="width:40%;">
-<div class="cell" data-reveal="true" data-fig-width="4">
-<div class="cell-output-display">
-<div>
-<p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-6">graph LR
-  subgraph Graph
-    xb7119b48552d1da3(["data"]):::outdated --&gt; xc74e60078fdc9490(["analysis_xgboost_tag2"]):::outdated
-    xb7119b48552d1da3(["data"]):::outdated --&gt; x142d7a4d7e9c35b0(["analysis_keras_tag1"]):::outdated
-  end
-  classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
-  classDef none stroke:#000000,color:#000000,fill:#94a4ac;
-</pre>
-<div id="mermaid-tooltip-6" class="mermaidTooltip">
-
-</div>
-<p></p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="medium">
-<ul>
-<li>See also <code>tar_combine()</code> from <code>tarchetypes</code>.</li>
-</ul>
-</div>
-</section>
-<section id="dynamic-branching" class="slide level2 smaller">
-<h2>Dynamic branching</h2>
-<div class="tiny">
-<ul>
-<li>Can branch over vector elements, list elements, or rows of a data frame.</li>
-<li>Can be combined with static branching (e.g.&nbsp;<code>tar_map_rep()</code>).</li>
-<li>See <code>tar_group_count()</code> and friends for dynamic branching over <code>dplyr</code> row groups.</li>
-</ul>
-</div>
-<div class="columns">
-<div class="column" style="width:60%;">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19" data-code-line-numbers="8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># _targets.R file:</span></span>
-<span id="cb19-2"><a href="#cb19-2"></a><span class="fu">library</span>(targets)</span>
-<span id="cb19-3"><a href="#cb19-3"></a><span class="fu">list</span>(</span>
-<span id="cb19-4"><a href="#cb19-4"></a>  <span class="fu">tar_target</span>(<span class="at">name =</span> index, <span class="at">command =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)),</span>
-<span id="cb19-5"><a href="#cb19-5"></a>  <span class="fu">tar_target</span>(</span>
-<span id="cb19-6"><a href="#cb19-6"></a>    <span class="at">name =</span> result, </span>
-<span id="cb19-7"><a href="#cb19-7"></a>    <span class="at">command =</span> index <span class="sc">+</span> <span class="dv">7</span>,</span>
-<span id="cb19-8"><a href="#cb19-8"></a>    <span class="at">pattern =</span> <span class="fu">map</span>(index)</span>
-<span id="cb19-9"><a href="#cb19-9"></a>  )</span>
-<span id="cb19-10"><a href="#cb19-10"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-reveal="true" data-fig-width="4">
-<div class="cell-output-display">
-<div>
-<p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-7">graph LR
-  subgraph Graph
-    x04e94ee208381956(["index"]):::uptodate --&gt; x40ad95db433ebf41["result"]:::uptodate
-  end
-  classDef uptodate stroke:#000000,color:#ffffff,fill:#354823;
-  classDef none stroke:#000000,color:#000000,fill:#94a4ac;
-</pre>
-<div id="mermaid-tooltip-7" class="mermaidTooltip">
-
-</div>
-<p></p>
-</div>
-</div>
-</div>
-</div><div class="column" style="width:40%;">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">tar_make</span>()</span>
-<span id="cb20-2"><a href="#cb20-2"></a><span class="co">#&gt; • start target index</span></span>
-<span id="cb20-3"><a href="#cb20-3"></a><span class="co">#&gt; • built target index</span></span>
-<span id="cb20-4"><a href="#cb20-4"></a><span class="co">#&gt; • start branch result_d15ad156</span></span>
-<span id="cb20-5"><a href="#cb20-5"></a><span class="co">#&gt; • built branch result_d15ad156</span></span>
-<span id="cb20-6"><a href="#cb20-6"></a><span class="co">#&gt; • start branch result_591d8774</span></span>
-<span id="cb20-7"><a href="#cb20-7"></a><span class="co">#&gt; • built branch result_591d8774</span></span>
-<span id="cb20-8"><a href="#cb20-8"></a><span class="co">#&gt; • built pattern result</span></span>
-<span id="cb20-9"><a href="#cb20-9"></a><span class="co">#&gt; • end pipeline: 0.108 seconds</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p><br></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="fu">tar_read</span>(result, <span class="at">branches =</span> <span class="dv">2</span>)</span>
-<span id="cb21-2"><a href="#cb21-2"></a><span class="co">#&gt; result_591d8774 </span></span>
-<span id="cb21-3"><a href="#cb21-3"></a><span class="co">#&gt;               9 </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</div>
-</div>
-</section>
 <section id="extending-targets" class="slide level2">
 <h2>Extending <code>targets</code></h2>
 
@@ -1121,48 +898,48 @@ Will Landau
 <li>Usually requires metaprogramming: <a href="http://adv-r.had.co.nz/Computing-on-the-language.html#substitute" class="uri">http://adv-r.had.co.nz/Computing-on-the-language.html#substitute</a></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="co">#' @title Example target factory in an R package.</span></span>
-<span id="cb22-2"><a href="#cb22-2"></a><span class="co">#' @export</span></span>
-<span id="cb22-3"><a href="#cb22-3"></a><span class="co">#' @description A target factory to analyze data.</span></span>
-<span id="cb22-4"><a href="#cb22-4"></a><span class="co">#' @return A list of 3 target objects to:</span></span>
-<span id="cb22-5"><a href="#cb22-5"></a><span class="co">#'   1. Track the file for changes,</span></span>
-<span id="cb22-6"><a href="#cb22-6"></a><span class="co">#'   2. Read the data in the file, and</span></span>
-<span id="cb22-7"><a href="#cb22-7"></a><span class="co">#'   3. Analyze the data.</span></span>
-<span id="cb22-8"><a href="#cb22-8"></a><span class="co">#' @param File Character of length 1, path to the file.</span></span>
-<span id="cb22-9"><a href="#cb22-9"></a>target_factory <span class="ot">&lt;-</span> <span class="cf">function</span>(file) {</span>
-<span id="cb22-10"><a href="#cb22-10"></a>  <span class="fu">list</span>(</span>
-<span id="cb22-11"><a href="#cb22-11"></a>    <span class="fu">tar_target_raw</span>(<span class="st">"file"</span>, file, <span class="at">format =</span> <span class="st">"file"</span>, <span class="at">deployment =</span> <span class="st">"main"</span>),</span>
-<span id="cb22-12"><a href="#cb22-12"></a>    <span class="fu">tar_target_raw</span>(<span class="st">"data"</span>, <span class="fu">quote</span>(<span class="fu">read_data</span>(file)), <span class="at">format =</span> <span class="st">"fst_tbl"</span>, <span class="at">deployment =</span> <span class="st">"main"</span>),</span>
-<span id="cb22-13"><a href="#cb22-13"></a>    <span class="fu">tar_target_raw</span>(<span class="st">"model"</span>, <span class="fu">quote</span>(<span class="fu">run_model</span>(data)), <span class="at">format =</span> <span class="st">"qs"</span>)</span>
-<span id="cb22-14"><a href="#cb22-14"></a>  )</span>
-<span id="cb22-15"><a href="#cb22-15"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">#' @title Example target factory in an R package.</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="co">#' @export</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="co">#' @description A target factory to analyze data.</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="co">#' @return A list of 3 target objects to:</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="co">#'   1. Track the file for changes,</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="co">#'   2. Read the data in the file, and</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="co">#'   3. Analyze the data.</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="co">#' @param File Character of length 1, path to the file.</span></span>
+<span id="cb14-9"><a href="#cb14-9"></a>target_factory <span class="ot">&lt;-</span> <span class="cf">function</span>(file) {</span>
+<span id="cb14-10"><a href="#cb14-10"></a>  <span class="fu">list</span>(</span>
+<span id="cb14-11"><a href="#cb14-11"></a>    <span class="fu">tar_target_raw</span>(<span class="st">"file"</span>, file, <span class="at">format =</span> <span class="st">"file"</span>, <span class="at">deployment =</span> <span class="st">"main"</span>),</span>
+<span id="cb14-12"><a href="#cb14-12"></a>    <span class="fu">tar_target_raw</span>(<span class="st">"data"</span>, <span class="fu">quote</span>(<span class="fu">read_data</span>(file)), <span class="at">format =</span> <span class="st">"fst_tbl"</span>, <span class="at">deployment =</span> <span class="st">"main"</span>),</span>
+<span id="cb14-13"><a href="#cb14-13"></a>    <span class="fu">tar_target_raw</span>(<span class="st">"model"</span>, <span class="fu">quote</span>(<span class="fu">run_model</span>(data)), <span class="at">format =</span> <span class="st">"qs"</span>)</span>
+<span id="cb14-14"><a href="#cb14-14"></a>  )</span>
+<span id="cb14-15"><a href="#cb14-15"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="target-factories-simplify-pipelines." class="slide level2">
 <h2>Target factories simplify pipelines.</h2>
 <p><br></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="co"># _targets.R</span></span>
-<span id="cb23-2"><a href="#cb23-2"></a><span class="fu">library</span>(targets)</span>
-<span id="cb23-3"><a href="#cb23-3"></a><span class="fu">library</span>(yourExamplePackage)</span>
-<span id="cb23-4"><a href="#cb23-4"></a><span class="fu">list</span>(</span>
-<span id="cb23-5"><a href="#cb23-5"></a>  <span class="fu">target_factory</span>(<span class="st">"data.csv"</span>)</span>
-<span id="cb23-6"><a href="#cb23-6"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># _targets.R</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">library</span>(targets)</span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="fu">library</span>(yourExamplePackage)</span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="fu">list</span>(</span>
+<span id="cb15-5"><a href="#cb15-5"></a>  <span class="fu">target_factory</span>(<span class="st">"data.csv"</span>)</span>
+<span id="cb15-6"><a href="#cb15-6"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="co"># R console</span></span>
-<span id="cb24-2"><a href="#cb24-2"></a><span class="fu">tar_manifest</span>()</span>
-<span id="cb24-3"><a href="#cb24-3"></a><span class="co">#&gt; # A tibble: 3 x 2</span></span>
-<span id="cb24-4"><a href="#cb24-4"></a><span class="co">#&gt;   name  command          </span></span>
-<span id="cb24-5"><a href="#cb24-5"></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;            </span></span>
-<span id="cb24-6"><a href="#cb24-6"></a><span class="co">#&gt; 1 file  "\"data.csv\""   </span></span>
-<span id="cb24-7"><a href="#cb24-7"></a><span class="co">#&gt; 2 data  "read_data(file)"           </span></span>
-<span id="cb24-8"><a href="#cb24-8"></a><span class="co">#&gt; 3 model "run_model(data)"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># R console</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="fu">tar_manifest</span>()</span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="co">#&gt; # A tibble: 3 x 2</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a><span class="co">#&gt;   name  command          </span></span>
+<span id="cb16-5"><a href="#cb16-5"></a><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;            </span></span>
+<span id="cb16-6"><a href="#cb16-6"></a><span class="co">#&gt; 1 file  "\"data.csv\""   </span></span>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="co">#&gt; 2 data  "read_data(file)"           </span></span>
+<span id="cb16-8"><a href="#cb16-8"></a><span class="co">#&gt; 3 model "run_model(data)"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="example-stantargets" class="slide level2">
-<h2>Example: <code>stantargets</code></h2>
+<section id="enter-stantargets" class="slide level2">
+<h2>Enter <code>stantargets</code></h2>
 <center>
 <img src="./images/stantargets.png" height="350px">
 </center>
@@ -1181,7 +958,7 @@ Will Landau
 <li>Flexible specification of posterior distributions.</li>
 <li>Indifferent to conjugacy.</li>
 </ul></li>
-<li>Variational inference (ADVI)</li>
+<li>Variational inference (ADVI for now, Pathfinder to come)</li>
 <li>Penalized MLE (L-BFGS)</li>
 </ul>
 </section>
@@ -1248,17 +1025,17 @@ Will Landau
 </ul>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="co"># _targets.R</span></span>
-<span id="cb25-2"><a href="#cb25-2"></a><span class="co"># ...</span></span>
-<span id="cb25-3"><a href="#cb25-3"></a><span class="fu">list</span>(</span>
-<span id="cb25-4"><a href="#cb25-4"></a>  stantargets<span class="sc">::</span><span class="fu">tar_stan_mcmc</span>(<span class="at">name =</span> example, ...)</span>
-<span id="cb25-5"><a href="#cb25-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># _targets.R</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="co"># ...</span></span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="fu">list</span>(</span>
+<span id="cb17-4"><a href="#cb17-4"></a>  stantargets<span class="sc">::</span><span class="fu">tar_stan_mcmc</span>(<span class="at">name =</span> example, ...)</span>
+<span id="cb17-5"><a href="#cb17-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-reveal="true" data-fig-width="6.5">
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-8">graph LR
+</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-5">graph LR
   subgraph Graph
     x4cd7b5c3c125f548(["example_data"]):::outdated --&gt; xecfe54c2d4fb279d(["example_summary_model"]):::outdated
     x6cc8b8be867e1e0d(["example_mcmc_model"]):::outdated --&gt; xecfe54c2d4fb279d(["example_summary_model"]):::outdated
@@ -1270,7 +1047,7 @@ Will Landau
   classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
   classDef none stroke:#000000,color:#000000,fill:#94a4ac;
 </pre>
-<div id="mermaid-tooltip-8" class="mermaidTooltip">
+<div id="mermaid-tooltip-5" class="mermaidTooltip">
 
 </div>
 <p></p>
@@ -1287,17 +1064,17 @@ Will Landau
 </ul>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="co"># _targets.R</span></span>
-<span id="cb26-2"><a href="#cb26-2"></a><span class="co"># ...</span></span>
-<span id="cb26-3"><a href="#cb26-3"></a><span class="fu">list</span>(</span>
-<span id="cb26-4"><a href="#cb26-4"></a>  stantargets<span class="sc">::</span><span class="fu">tar_stan_mcmc_rep_summary</span>(<span class="at">name =</span> example, ...)</span>
-<span id="cb26-5"><a href="#cb26-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># _targets.R</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="co"># ...</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="fu">list</span>(</span>
+<span id="cb18-4"><a href="#cb18-4"></a>  stantargets<span class="sc">::</span><span class="fu">tar_stan_mcmc_rep_summary</span>(<span class="at">name =</span> example, ...)</span>
+<span id="cb18-5"><a href="#cb18-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-reveal="true" data-fig-width="8">
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-9">graph LR
+</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-6">graph LR
   subgraph Graph
     x4cd7b5c3c125f548["example_data"]:::outdated --&gt; xbeea21a0642714d5["example_model"]:::outdated
     xbeea21a0642714d5["example_model"]:::outdated --&gt; xe6eda53558c41c5e(["example"]):::outdated
@@ -1307,7 +1084,7 @@ Will Landau
   classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
   classDef none stroke:#000000,color:#000000,fill:#94a4ac;
 </pre>
-<div id="mermaid-tooltip-9" class="mermaidTooltip">
+<div id="mermaid-tooltip-6" class="mermaidTooltip">
 
 </div>
 <p></p>
@@ -1315,9 +1092,47 @@ Will Landau
 </div>
 </div>
 </section>
+<section id="example-model" class="slide level2">
+<h2>Example model</h2>
+<div class="columns">
+<div class="column" style="width:70%;">
+<div class="medium">
+<p><span class="math display">\[
+\begin{aligned}
+&amp; y \sim \text{MVN}(X_{(n \cdot t) \times p} \beta, \ I_{n \times n} \otimes \Sigma_{t \times t} ) \\
+&amp; \qquad \beta \sim \text{MVN} (0, s_\beta^2 I_{p \times p})\\
+&amp;  \qquad \Sigma_{t \times t} = \left (I_{t \times t} \sigma \right ) \Lambda_{t \times t} \Lambda_{t \times t}' \left (I_{t \times t} \sigma \right ) \\
+&amp; \qquad \qquad \sigma_1, \ldots, \sigma_t \stackrel{\text{ind}}{\sim} \text{Cauchy}^+(0, s_\sigma) \\
+&amp; \qquad \qquad \Lambda_{t \times t}\Lambda_{t \times t}' \sim \text{LKJ}(\text{shape} = 1, \text{order} = t)
+\end{aligned}
+\]</span></p>
+<ul>
+<li>Used to model longitudinal clinical trial data.</li>
+</ul>
+</div>
+</div><div class="column" style="width:30%;">
+<div class="tiny">
+<ul>
+<li><span class="math inline">\(n\)</span>: number of patients</li>
+<li><span class="math inline">\(t\)</span>: number of scheduled visits</li>
+<li><span class="math inline">\(p\)</span>: number of fixed effects</li>
+<li><span class="math inline">\(y\)</span>: constant vector of <span class="math inline">\(n \cdot t\)</span> observed clinical outcomes (1 per patient visit).</li>
+<li><span class="math inline">\(X_{(n \cdot t) \times p}\)</span>: model matrix with <span class="math inline">\(n \cdot t\)</span> rows and <span class="math inline">\(p\)</span> columns.</li>
+<li><span class="math inline">\(\beta\)</span>: parameter vector of <span class="math inline">\(p\)</span> fixed effects.</li>
+<li><span class="math inline">\(\otimes\)</span>: Kronecker product.</li>
+<li><span class="math inline">\(\Sigma_{t \times t}\)</span>: residual covariance block</li>
+<li><span class="math inline">\(\Lambda_{t \times t}\)</span>: Cholesky factor of the residual correlation matrix.</li>
+<li><span class="math inline">\(\sigma_t\)</span>: residual standard deviation for visit <span class="math inline">\(t\)</span>.</li>
+<li><span class="math inline">\(s_\beta\)</span>, <span class="math inline">\(s_\sigma\)</span>: hyperparameters</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
 <section id="thanks" class="slide level2">
 <h2>Thanks</h2>
 <ul>
+<li><a href="https://www.jarad.me/">Jarad</a> sparked and encouraged my interest in pipeline tools.</li>
 <li><a href="https://ropensci.org/">rOpenSci</a> reviewed, adopted, and promoted <code>targets</code> and its ecosystem.</li>
 <li>rOpenSci <a href="https://github.com/ropensci/software-review/issues/401">reviewers</a> of <code>targets</code> and <code>tarchetypes</code>: <a href="https://github.com/limnoliver">Samantha Oliver</a>, <a href="https://github.com/tjmahr">TJ Mahr</a>.</li>
 <li>Contributions from the community:

@@ -39,15 +39,15 @@ knitr::opts_chunk$set(
 
 <center>
 <br>
-<h3>Introduction to the `targets` R package</h3>
-<img src="./images/logo.png" height="400px">
+<h3>Bayesian data analysis pipelines with {stantargets}</h3>
+<img src="./images/stantargets.png" height="400px">
 <br>
 <h4>Will Landau</h4>
 </center>
 
 ## Demanding computation in R {.smaller}
 
-* **Bayesian data analysis: JAGS, Stan, NIMBLE, `greta`**
+* **Bayesian data analysis: Stan, JAGS, NIMBLE, `greta`**
 * Deep learning: `keras`, `tensorflow`, `torch`
 * Machine learning: `tidymodels`
 * PK/PD: `nlmixr`, `mrgsolve`
@@ -495,227 +495,6 @@ graph LR
     * <https://books.ropensci.org/targets/hpc.html>
 :::
 
-## Literate programming {.smaller}
-
-* `tar_quarto()` or `tar_render()` from the `tarchetypes` package.
-* Render a Quarto document/project or R Markdown document as a target in the pipeline.
-* Documents rely on upstream targets through `tar_read()` and `tar_load()`.
-    * `tar_quarto()` and `tar_render()` register upstream targets as dependencies.
-    * The documents themselves should run quickly and do little to no original computation.
-* Multiple ways to render the report:
-    1. Option 1: develop it interactively (RStudio IDE, `rmarkdown::render()`, `quarto::quarto_render()`.
-    1. Option 2: run the pipeline (e.g. `tar_make()`) to get reproducible HTML output.
-    
-
-## Example `report.qmd`
-
-<br>
-
-````{verbatim, echo = TRUE}
----
-title: "Results"
-format: html
----
-
-```{r}
-library(targets)
-tar_read(model)
-tar_load(plot)
-print(plot)
-```
-````
-
-## In a pipeline {.smaller}
-
-```{r, eval = FALSE, echo = TRUE, `code-line-numbers`="11"}
-# _targets.R file, written by use_targets() and then modified:
-library(targets)
-tar_option_set(packages = c("dplyr", "ggplot2", "readr"))
-options(clustermq.scheduler = "multicore")
-tar_source()
-list(
-  tar_target(name = file, command = "data.csv", format = "file"),
-  tar_target(name = data, command = get_data(file)),
-  tar_target(name = model, command = fit_model(data)),
-  tar_target(name = plot, command = plot_model(model, data)),
-  tarchetypes::tar_quarto(name = report, path = "report.qmd")
-)
-```
-
-:::: {.columns}
-
-::: {.column width="40%"}
-
-```{r, eval = FALSE,  echo = TRUE}
-tar_make()
-#> ✔ skip target file
-#> ✔ skip target data
-#> ✔ skip target model
-#> ✔ skip target plot
-#> • start target report
-#> • built target report
-#> • end pipeline: 5.758 seconds
-```
-
-:::
-
-::: {.column width="60%"}
-
-```{mermaid}
-%%| fig-width: 5.5
-graph LR
-  subgraph legend
-    x7420bd9270f8d27d([""Up to date""]):::uptodate --- x0a52b03877696646([""Outdated""]):::outdated
-    x0a52b03877696646([""Outdated""]):::outdated --- xbf4603d6c2c2ad6b([""Stem""]):::none
-    xbf4603d6c2c2ad6b([""Stem""]):::none --- xf0bce276fe2b9d3e>""Function""]:::none
-  end
-  subgraph Graph
-    xe1eeca7af8e0b529(["model"]):::uptodate --> xe0fba61fbc506510(["report"]):::outdated
-    xaf95534ce5e3f59e(["plot"]):::uptodate --> xe0fba61fbc506510(["report"]):::outdated
-    xb7119b48552d1da3(["data"]):::uptodate --> xaf95534ce5e3f59e(["plot"]):::uptodate
-    xe1eeca7af8e0b529(["model"]):::uptodate --> xaf95534ce5e3f59e(["plot"]):::uptodate
-    x619ade380bedf7c2>"plot_model"]:::uptodate --> xaf95534ce5e3f59e(["plot"]):::uptodate
-    x6d51284275156668(["file"]):::uptodate --> xb7119b48552d1da3(["data"]):::uptodate
-    xd69ee82cddb4d6bb>"get_data"]:::uptodate --> xb7119b48552d1da3(["data"]):::uptodate
-    xb7119b48552d1da3(["data"]):::uptodate --> xe1eeca7af8e0b529(["model"]):::uptodate
-    x9c2a6d6bf64731cc>"fit_model"]:::uptodate --> xe1eeca7af8e0b529(["model"]):::uptodate
-  end
-  classDef uptodate stroke:#000000,color:#ffffff,fill:#354823;
-  classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
-  classDef none stroke:#000000,color:#000000,fill:#94a4ac;
-  linkStyle 0 stroke-width:0px;
-  linkStyle 1 stroke-width:0px;
-  linkStyle 2 stroke-width:0px;
-```
-
-:::
-
-::::
-
-## Reproducible HTML report
-
-![](./images/report.png)
-
-## Static branching {.smaller}
-
-```{r, eval = FALSE,  echo = TRUE, `code-line-numbers` = "8-14"}
-# _targets.R file, written by use_targets() and then modified:
-library(targets)
-options(clustermq.scheduler = "multicore")
-tar_source()
-list(
-  tar_target(name = file, command = "data.csv", format = "file"),
-  tar_target(name = data, command = get_data(file)),
-  tarchetypes::tar_map(
-    tar_target(name = analysis, command = method(data, tag)),
-    values = tibble::tibble(
-      method = rlang::syms(c("run_keras", "run_xgboost")),
-      tag = c("tag1", "tag2")
-    )
-  )
-)
-```
-
-:::: {.columns}
-
-::: {.column width="60%"}
-```{r, echo = TRUE, eval = FALSE}
-tar_manifest()
-#> # A tibble: 3 × 2
-#>   name                  command                  
-#>   <chr>                 <chr>                    
-#> 1 data                  "get_data()"             
-#> 2 analysis_xgboost_tag2 "run_xgboost(data, \"tag2\")"
-#> 3 analysis_keras_tag1   "run_keras(data, \"tag1\")"
-```
-
-
-:::
-
-::: {.column width="40%"}
-
-```{mermaid}
-%%| fig-width: 4
-graph LR
-  subgraph Graph
-    xb7119b48552d1da3(["data"]):::outdated --> xc74e60078fdc9490(["analysis_xgboost_tag2"]):::outdated
-    xb7119b48552d1da3(["data"]):::outdated --> x142d7a4d7e9c35b0(["analysis_keras_tag1"]):::outdated
-  end
-  classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
-  classDef none stroke:#000000,color:#000000,fill:#94a4ac;
-```
-
-:::
-
-::::
-
-:::{.medium}
-* See also `tar_combine()` from `tarchetypes`.
-:::
-
-## Dynamic branching {.smaller}
-
-:::{.tiny}
-* Can branch over vector elements, list elements, or rows of a data frame.
-* Can be combined with static branching (e.g. `tar_map_rep()`).
-* See `tar_group_count()` and friends for dynamic branching over `dplyr` row groups.
-:::
-
-:::: {.columns}
-
-::: {.column width="60%"}
-
-```{r, echo = TRUE, eval = FALSE, `code-line-numbers` = "8"}
-# _targets.R file:
-library(targets)
-list(
-  tar_target(name = index, command = c(1, 2)),
-  tar_target(
-    name = result, 
-    command = index + 7,
-    pattern = map(index)
-  )
-)
-```
-
-```{mermaid}
-%%| fig-width: 4
-graph LR
-  subgraph Graph
-    x04e94ee208381956(["index"]):::uptodate --> x40ad95db433ebf41["result"]:::uptodate
-  end
-  classDef uptodate stroke:#000000,color:#ffffff,fill:#354823;
-  classDef none stroke:#000000,color:#000000,fill:#94a4ac;
-```
-
-:::
-
-::: {.column width="40%"}
-
-```{r, echo = TRUE, eval = FALSE}
-tar_make()
-#> • start target index
-#> • built target index
-#> • start branch result_d15ad156
-#> • built branch result_d15ad156
-#> • start branch result_591d8774
-#> • built branch result_591d8774
-#> • built pattern result
-#> • end pipeline: 0.108 seconds
-```
-
-<br>
-
-```{r, echo = TRUE, eval = FALSE}
-tar_read(result, branches = 2)
-#> result_591d8774 
-#>               9 
-```
-
-:::
-
-::::
-
 ## Extending `targets`
 
 ![](./images/targetopia.png)
@@ -769,7 +548,7 @@ tar_manifest()
 #> 3 model "run_model(data)"
 ```
 
-## Example: `stantargets`
+## Enter `stantargets`
 
 <center>
 <image src="./images/stantargets.png" height = "350px">
@@ -785,7 +564,7 @@ tar_manifest()
     * Often more efficient than Gibbs sampling.
     * Flexible specification of posterior distributions.
     * Indifferent to conjugacy.
-* Variational inference (ADVI)
+* Variational inference (ADVI for now, Pathfinder to come)
 * Penalized MLE (L-BFGS)
 
 ## Target factories for Stan  {.smaller}
@@ -861,11 +640,56 @@ graph LR
   classDef none stroke:#000000,color:#000000,fill:#94a4ac;
 ```
 
+## Example model
+
+:::: {.columns}
+::: {.column width="70%"}
+::: {.medium}
+$$
+\begin{aligned}
+& y \sim \text{MVN}(X_{(n \cdot t) \times p} \beta, \ I_{n \times n} \otimes \Sigma_{t \times t} ) \\
+& \qquad \beta \sim \text{MVN} (0, s_\beta^2 I_{p \times p})\\
+&  \qquad \Sigma_{t \times t} = \left (I_{t \times t} \sigma \right ) \Lambda_{t \times t} \Lambda_{t \times t}' \left (I_{t \times t} \sigma \right ) \\
+& \qquad \qquad \sigma_1, \ldots, \sigma_t \stackrel{\text{ind}}{\sim} \text{Uniform}(0, s_\sigma) \\
+& \qquad \qquad \Lambda_{t \times t}\Lambda_{t \times t}' \sim \text{LKJ}(\text{shape} = s_\lambda, \text{order} = t)
+\end{aligned} 
+$$
+
+* Used to analyze longitudinal clinical trial data.
+:::
+
+:::
+
+::: {.column width="30%"}
+::: {.tiny}
+* $n$: number of patients
+* $t$: number of scheduled visits
+* $p$: number of fixed effects
+* $y$: constant vector of $n \cdot t$ observed clinical outcomes (1 per patient visit).
+* $X_{(n \cdot t) \times p}$: model matrix with $n \cdot t$ rows and $p$ columns.
+* $\beta$: parameter vector of $p$ fixed effects.
+* $\otimes$: Kronecker product.
+* $\Sigma_{t \times t}$: residual covariance block
+* $\Lambda_{t \times t}$: lower-triangular Cholesky factor of the residual correlation matrix.
+* $\sigma_t$: residual standard deviation for visit $t$.
+* $s_\beta$, $s_\sigma$, $s_\lambda$: hyperparameters
+:::
+:::
+
+::::
+
+## Live demos
+
+* <https://github.com/wlandau/stantargets-talk>
+  * `demo_analysis.R`
+  * `demo_simulation.R`.
 
 ## Thanks
 
-* [rOpenSci](https://ropensci.org/) reviewed, adopted, and promoted `targets` and its ecosystem.
-* rOpenSci [reviewers](https://github.com/ropensci/software-review/issues/401) of `targets` and `tarchetypes`: [Samantha Oliver](https://github.com/limnoliver), [TJ Mahr](https://github.com/tjmahr).
+* [Jarad](https://www.jarad.me/) sparked and encouraged my interest in pipeline tools.
+* [rOpenSci](https://ropensci.org/) reviewed, adopted, and promoted `targets` and `stantargets`.
 * Contributions from the community:
-    * Developers: <https://github.com/ropensci/targets/graphs/contributors>.
-    * Discussions: <https://github.com/ropensci/targets/discussions>
+    * <https://github.com/ropensci/targets/discussions>
+    * <https://github.com/ropensci/stantargets/discussions>
+
+## References
