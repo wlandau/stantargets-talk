@@ -31,7 +31,7 @@
 #' str(data)
 #' data$.join_data <- NULL
 #' model <- cmdstanr::cmdstan_model("model.stan")
-#' fit <- model$sample(data = data)
+#' fit <- model$sample(data = data, iter_sampling = 2e3, iter_warmup = 2e3)
 #' fit$summary()
 simulate_data <- function(
   n_patient = 50,
