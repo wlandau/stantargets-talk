@@ -39,7 +39,7 @@ knitr::opts_chunk$set(
 
 <center>
 <br>
-<h3>Bayesian data analysis pipelines with {stantargets}</h3>
+<h3>Bayesian pipelines with {stantargets}</h3>
 <img src="./images/stantargets.png" height="400px">
 <br>
 <h4>Will Landau</h4>
@@ -112,280 +112,7 @@ knitr::opts_chunk$set(
 6. Inspect the results with `tar_read()` or `tar_load()`.
 7 Scale up the pipeline if you started small.
 
-## R functions
-
-```{r, eval = FALSE, echo = TRUE}
-# R/functions.R file:
-get_data <- function(file) {
-  read_csv(file, col_types = cols()) %>%
-    filter(!is.na(Ozone))
-}
-
-fit_model <- function(data) {
-  lm(Ozone ~ Temp, data) %>%
-    coefficients()
-}
-
-plot_model <- function(model, data) {
-  ggplot(data) +
-    geom_point(aes(x = Temp, y = Ozone)) +
-    geom_abline(intercept = model[1], slope = model[2]) +
-    theme_gray(24)
-}
-```
-
-## `use_targets()`
-
-* Files before `use_targets()`:
-
-```{r, eval = FALSE, echo = TRUE}
-├── R
-│   └── functions.R
-```
-
-<br>
-
-* Files after `use_targets()`:
-
-```{r, eval = FALSE, echo = TRUE}
-├── R
-│   └── functions.R
-├── _targets.R
-├── ... # Other output helper files may depend on your system.
-```
-
-## `_targets.R` default content (1/2)
-
-<br>
-
-```{r, eval = FALSE, echo = TRUE}
-# Load packages required to define the pipeline:
-library(targets)
-# library(tarchetypes) # Load other packages as needed. # nolint
-
-# Set target options:
-tar_option_set(
-  packages = c("tibble"), # packages that your targets need to run
-  format = "rds" # default storage format
-  # Set other options as needed.
-)
-
-# tar_make_clustermq() configuration (okay to leave alone):
-options(clustermq.scheduler = "multicore")
-
-# tar_make_future() configuration (okay to leave alone):
-future::plan(future.callr::callr)
-```
-
-## `_targets.R` default content (2/2) 
-
-<br>
-
-```{r, eval = FALSE, echo = TRUE, attr.source = ".numberLines .lineAnchors startFrom='17'"}
-# Run the R scripts in the R/ folder with your custom functions:
-tar_source()
-# source("other_functions.R") # Source other scripts as needed.
-
-# Replace the target list below with your own:
-list(
-  tar_target(
-    name = data,
-    command = tibble(x = rnorm(100), y = rnorm(100))
-#   format = "feather" # efficient storage of large data frames
-  ),
-  tar_target(
-    name = model,
-    command = coefficients(lm(y ~ x, data = data))
-  )
-)
-```
-
-## Modify `_targets.R` by hand.
-
-<br>
-
-```{r, eval = FALSE, echo = TRUE}
-# _targets.R file, written by use_targets() and then modified:
-library(targets)
-tar_option_set(packages = c("dplyr", "ggplot2", "readr"))
-options(clustermq.scheduler = "multicore")
-tar_source()
-list(
-  tar_target(name = file, command = "data.csv", format = "file"),
-  tar_target(name = data, command = get_data(file)),
-  tar_target(name = model, command = fit_model(data)),
-  tar_target(name = plot, command = plot_model(model, data))
-)
-```
-
-## Manifest
-
-<br>
-
-```{r, eval = FALSE, echo = TRUE}
-tar_manifest()
-#> # A tibble: 4 × 2
-#>   name  command                  
-#>   <chr> <chr>                    
-#> 1 file  "\"data.csv\""           
-#> 2 data  "get_data(file)"         
-#> 3 model "fit_model(data)"        
-#> 4 plot  "plot_model(model, data)"
-```
-
-## Dependency graph {.smaller}
-
-* `tar_mermaid()` (below), `tar_visnetwork()`, or `tar_glimpse()`.
-
-```{mermaid}
-graph LR
-  subgraph legend
-    x0a52b03877696646([""Outdated""]):::outdated --- xbf4603d6c2c2ad6b([""Stem""]):::none
-    xbf4603d6c2c2ad6b([""Stem""]):::none --- xf0bce276fe2b9d3e>""Function""]:::none
-  end
-  subgraph Graph
-    xb7119b48552d1da3(["data"]):::outdated --> xaf95534ce5e3f59e(["plot"]):::outdated
-    xe1eeca7af8e0b529(["model"]):::outdated --> xaf95534ce5e3f59e(["plot"]):::outdated
-    x619ade380bedf7c2>"plot_model"]:::outdated --> xaf95534ce5e3f59e(["plot"]):::outdated
-    x6d51284275156668(["file"]):::outdated --> xb7119b48552d1da3(["data"]):::outdated
-    xd69ee82cddb4d6bb>"get_data"]:::outdated --> xb7119b48552d1da3(["data"]):::outdated
-    xb7119b48552d1da3(["data"]):::outdated --> xe1eeca7af8e0b529(["model"]):::outdated
-    x9c2a6d6bf64731cc>"fit_model"]:::outdated --> xe1eeca7af8e0b529(["model"]):::outdated
-  end
-  classDef outdated stroke:#000000,color:#000000,fill:#78B7C5;
-  classDef none stroke:#000000,color:#000000,fill:#94a4ac;
-  linkStyle 0 stroke-width:0px;
-  linkStyle 1 stroke-width:0px;
-```
-
-## Run the pipeline
-
-<br>
-
-```{r, eval = FALSE, echo = TRUE}
-tar_make()
-#> • start target file
-#> • built target file
-#> • start target data
-#> • built target data
-#> • start target model
-#> • built target model
-#> • start target plot
-#> • built target plot
-#> • end pipeline: 1.331 seconds
-```
-
-## Data store
-
-<br>
-
-:::: {.columns}
-
-::: {.column width="40%"}
-
-```{r, eval = FALSE, echo = TRUE}
-├── _targets
-│   ├── meta
-│   │   ├── meta
-│   │   ├── process
-│   │   └── progress
-│   ├── objects
-│   │   ├── data
-│   │   ├── model
-│   │   └── plot
-│   └── user
-```
-
-:::
-
-::: {.column width="60%"}
-
-```{r, eval = FALSE, echo = TRUE}
-tar_read(plot)
-```
-
-![](./images/plot.png)
-
-:::
-
-::::
-
-## Everything is up to date. {.smaller}
-
-<br>
-
-:::: {.columns}
-
-::: {.column width="40%"}
-
-```{r, eval = FALSE, echo = TRUE}
-tar_outdated()
-#> character(0)
-
-tar_make()
-#> ✔ skip target file
-#> ✔ skip target data
-#> ✔ skip target model
-#> ✔ skip target plot
-#> ✔ skip pipeline: 0.077 seconds
-```
-
-:::
-
-::: {.column width="60%"}
-
-```{mermaid}
-%%| fig-width: 5.5
-graph LR
-  subgraph legend
-    x7420bd9270f8d27d([""Up to date""]):::uptodate --- xbf4603d6c2c2ad6b([""Stem""]):::none
-    xbf4603d6c2c2ad6b([""Stem""]):::none --- xf0bce276fe2b9d3e>""Function""]:::none
-  end
-  subgraph Graph
-    xb7119b48552d1da3(["data"]):::uptodate --> xaf95534ce5e3f59e(["plot"]):::uptodate
-    xe1eeca7af8e0b529(["model"]):::uptodate --> xaf95534ce5e3f59e(["plot"]):::uptodate
-    x619ade380bedf7c2>"plot_model"]:::uptodate --> xaf95534ce5e3f59e(["plot"]):::uptodate
-    x6d51284275156668(["file"]):::uptodate --> xb7119b48552d1da3(["data"]):::uptodate
-    xd69ee82cddb4d6bb>"get_data"]:::uptodate --> xb7119b48552d1da3(["data"]):::uptodate
-    xb7119b48552d1da3(["data"]):::uptodate --> xe1eeca7af8e0b529(["model"]):::uptodate
-    x9c2a6d6bf64731cc>"fit_model"]:::uptodate --> xe1eeca7af8e0b529(["model"]):::uptodate
-  end
-  classDef uptodate stroke:#000000,color:#ffffff,fill:#354823;
-  classDef none stroke:#000000,color:#000000,fill:#94a4ac;
-  linkStyle 0 stroke-width:0px;
-  linkStyle 1 stroke-width:0px;
-```
-
-:::
-
-::::
-
-## Change a function
-
-<br>
-
-```{r, echo = TRUE, eval = FALSE, `code-line-numbers`="17"}
-# R/functions.R:
-get_data <- function(file) {
-  read_csv(file, col_types = cols()) %>%
-    filter(!is.na(Ozone))
-}
-
-fit_model <- function(data) {
-  lm(Ozone ~ Temp, data) %>%
-    coefficients()
-}
-
-plot_model <- function(model, data) {
-  ggplot(data) +
-    geom_point(aes(x = Temp, y = Ozone)) +
-    geom_abline(intercept = model[1], slope = model[2]) +
-    theme_gray(24) +
-    ggtitle("Ozone vs Temp")
-}
-```
-
-## Refresh the pipeline. {.smaller}
+## Example {.smaller}
 
 <br>
 
@@ -415,6 +142,8 @@ tar_read(plot)
 
 ::: {.column width="60%"}
 
+* `tar_mermaid()` graph:
+
 ```{mermaid}
 %%| fig-width: 5.5
 graph LR
@@ -440,6 +169,9 @@ graph LR
   linkStyle 1 stroke-width:0px;
   linkStyle 2 stroke-width:0px;
 ```
+
+* See also `tar_visnetwork()`.
+* Details: <https://wlandau.github.io/targets-intro>. 
 
 :::
 
@@ -554,18 +286,8 @@ tar_manifest()
 <image src="./images/stantargets.png" height = "350px">
 </center>
 
-* Easy pipeline construction for Stan statistical models.
+* Easy pipeline creation for [Stan](https://mc-stan.org/) models.
 * Uses R packages [`cmdstanr`](https://mc-stan.org/cmdstanr/) and [`posterior`](https://mc-stan.org/posterior/).
-
-## About Stan
-
-* Probabilistic programming language: <https://www.jstatsoft.org/article/view/v076i01>.
-* Markov chain Monte Carlo (MCMC) with HMC and NUTS.
-    * Often more efficient than Gibbs sampling.
-    * Flexible specification of posterior distributions.
-    * Indifferent to conjugacy.
-* Variational inference (ADVI for now, Pathfinder to come)
-* Penalized MLE (L-BFGS)
 
 ## Target factories for Stan  {.smaller}
 
@@ -577,7 +299,7 @@ Algorithm | Single-rep multi-output | Multi-rep single-output
 MCMC | `tar_stan_mcmc()     ` | `tar_stan_mcmc_rep_draws()` `tar_stan_mcmc_rep_diagnostics()` `tar_stan_mcmc_rep_summary()`
 Gen. Qty. | `tar_stan_gq()` | `tar_stan_gq_rep_draws()`  `tar_stan_gq_rep_summary()`
 Variational | `tar_stan_vb()` | `tar_stan_vb_rep_draws()`  `tar_stan_vb_rep_summary()` 
-MLE  | `tar_stan_mle()` | `tar_stan_mle_rep_draws()`  `tar_stan_mle_rep_summary()`
+Optimization  | `tar_stan_mle()` | `tar_stan_mle_rep_draws()`  `tar_stan_mle_rep_summary()`
 Compilation | `tar_stan_compile()` | 
 Summaries | `tar_stan_summary()` | 
 :::
@@ -686,7 +408,8 @@ $$
 
 ## Thanks
 
-* [Jarad](https://www.jarad.me/) sparked and encouraged my interest in pipeline tools.
+* [Jarad Niemi](https://www.jarad.me/) sparked and encouraged my interest in pipeline tools.
+* [Rich FitzJohn](https://richfitz.github.io/)'s [`remake`](https://github.com/richfitz/remake) package established breakthrough concepts for pipelines in R.
 * [rOpenSci](https://ropensci.org/) reviewed, adopted, and promoted `targets` and `stantargets`.
 * Contributions from the community:
     * <https://github.com/ropensci/targets/discussions>
