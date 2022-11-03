@@ -5,9 +5,14 @@
 #'   on those parameter values.
 #' @details The model matrix `x` is also random.
 #' @return A Stan-compatible list of data and hyperparameters.
+#'   The model matrix x is given as the transpose of the model matrix
+#'   in the slides in order to speed up matrix multiplication in the Stan code.
+#'   The data records (columns) in x are ordered
+#'   by visit within patient, i.e. same as the row order of
+#'   tidyr::expand_grid(patient = seq_len(n_patient), visit = seq_len(n_visit))
 #'   The `.join_data` element is a list of parameter values that
 #'   `stantargets` uses to compare the prior to the posterior:
-#'   <https://docs.ropensci.org/stantargets/articles/simulation.html>
+#'   <https://docs.ropensci.org/stantargets/articles/simulation.html>.
 #' @param n_patient Positive integer of length 1, number of patients.
 #' @param n_visit Positive integer of length 1,
 #'   number of scheduled study visits.
@@ -22,9 +27,12 @@
 #'   of the Cholesky factor lambda of the within-patient residual
 #'   correlation matrix.
 #' @examples
-#' data <- simulate_data()
+#' data <- simulate_data(n_missing = 0)
 #' str(data)
+#' data$.join_data <- NULL
 #' model <- cmdstanr::cmdstan_model("model.stan")
+#' fit <- model$sample(data = data)
+#' fit$summary()
 simulate_data <- function(
   n_patient = 50,
   n_visit = 4,

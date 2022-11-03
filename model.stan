@@ -59,6 +59,10 @@ data {
   real<lower=0> s_beta;
   real<lower=0> s_sigma;
   real<lower=0> s_lambda;
+ /* The data records (columns) in the model matrix x are ordered
+  * by visit within patient, i.e. same as the row order of
+  * tidyr::expand_grid(patient = seq_len(n_patient), visit = seq_len(n_visit))
+  */
   matrix[n_beta, n_patient * n_visit] x;
   matrix[n_visit, n_patient] y;
 }
