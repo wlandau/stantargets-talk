@@ -39,7 +39,7 @@ knitr::opts_chunk$set(
 
 <center>
 <br>
-<h3>Bayesian pipelines with {stantargets}</h3>
+<h3>Bayesian pipelines with stantargets</h3>
 <img src="./images/stantargets.png" height="400px">
 <br>
 <h4>Will Landau</h4>
