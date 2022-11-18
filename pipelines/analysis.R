@@ -4,7 +4,7 @@ library(stantargets)
 tar_source()
 # For clustermq configuration with Slurm, see
 # https://books.ropensci.org/targets/hpc.html#clustermq-remote-configuration
-options(clustermq.scheduler = "multisession")
+options(clustermq.scheduler = "multiprocess")
 list(
   tar_stan_mcmc(
     name = analysis,
