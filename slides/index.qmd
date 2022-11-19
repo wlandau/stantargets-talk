@@ -388,7 +388,7 @@ $$
 * $t$: number of scheduled visits
 * $p$: number of fixed effects
 * $y$: constant vector of $n \cdot t$ observed clinical outcomes (1 per patient visit).
-* $X_{(n \cdot t) \times p}$: model matrix with $n \cdot t$ rows and $p$ columns. Typically has treatment assignemnts and baseline covariates.
+* $X_{(n \cdot t) \times p}$: model matrix with $n \cdot t$ rows and $p$ columns. Typically has treatment assignments and baseline covariates.
 * $\beta$: parameter vector of $p$ fixed effects.
 * $\otimes$: Kronecker product.
 * $\Sigma_{t \times t}$: residual covariance block
