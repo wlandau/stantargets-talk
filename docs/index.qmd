@@ -112,7 +112,27 @@ knitr::opts_chunk$set(
 6. Inspect the results with `tar_read()` or `tar_load()`.
 7 Scale up the pipeline if you started small.
 
-## Example {.smaller}
+## Example pipeline
+
+```{r, eval = FALSE, echo = TRUE}
+# _targets.R file, written by use_targets() and then modified
+
+# Setup:
+library(targets)
+tar_option_set(packages = c("dplyr", "ggplot2", "readr"))
+options(clustermq.scheduler = "multicore")
+tar_source() # Run scripts in the R/ folder.
+
+# Pipeline definition:
+list(
+  tar_target(name = file, command = "data.csv", format = "file"),
+  tar_target(name = data, command = get_data(file)),
+  tar_target(name = model, command = fit_model(data)),
+  tar_target(name = plot, command = plot_model(model, data))
+)
+```
+
+## Example usage {.smaller}
 
 <br>
 
