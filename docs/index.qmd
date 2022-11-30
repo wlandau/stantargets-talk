@@ -405,16 +405,16 @@ $$
 ::: {.column width="30%"}
 ::: {.tiny}
 * $n$: number of patients
-* $t$: number of scheduled visits
+* $t$: number of scheduled study visits (discrete time)
 * $p$: number of fixed effects
 * $y$: constant vector of $n \cdot t$ observed clinical outcomes (1 per patient visit).
-* $X_{(n \cdot t) \times p}$: model matrix with $n \cdot t$ rows and $p$ columns. Typically has treatment assignments and baseline covariates.
+* $X_{(n \cdot t) \times p}$: model matrix with $n \cdot t$ rows and $p$ columns with treatment assignments and baseline covariates.
 * $\beta$: parameter vector of $p$ fixed effects.
 * $\otimes$: Kronecker product.
-* $\Sigma_{t \times t}$: residual covariance block
-* $\Lambda_{t \times t}$: lower-triangular Cholesky factor of the residual correlation matrix.
-* $\sigma_t$: residual standard deviation for visit $t$.
-* $s_\beta$, $s_\sigma$, $s_\lambda$: hyperparameters
+* $\Sigma_{t \times t}$: residual covariance block (visits within patient)
+* $\Lambda_{t \times t}$: lower-triangular Cholesky factor of the residual correlation matrix block (visits within patient).
+* $\sigma = (\sigma_1, \ldots, \sigma_t)$, where $\sigma_s$ is the residual SD for visit $s$.
+* $s_\beta$, $s_\sigma$, $s_\lambda$: scalar hyperparameters
 :::
 :::
 

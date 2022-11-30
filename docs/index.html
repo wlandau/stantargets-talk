@@ -859,16 +859,16 @@ Will Landau
 <div class="tiny">
 <ul>
 <li><span class="math inline">\(n\)</span>: number of patients</li>
-<li><span class="math inline">\(t\)</span>: number of scheduled visits</li>
+<li><span class="math inline">\(t\)</span>: number of scheduled study visits (discrete time)</li>
 <li><span class="math inline">\(p\)</span>: number of fixed effects</li>
 <li><span class="math inline">\(y\)</span>: constant vector of <span class="math inline">\(n \cdot t\)</span> observed clinical outcomes (1 per patient visit).</li>
-<li><span class="math inline">\(X_{(n \cdot t) \times p}\)</span>: model matrix with <span class="math inline">\(n \cdot t\)</span> rows and <span class="math inline">\(p\)</span> columns. Typically has treatment assignments and baseline covariates.</li>
+<li><span class="math inline">\(X_{(n \cdot t) \times p}\)</span>: model matrix with <span class="math inline">\(n \cdot t\)</span> rows and <span class="math inline">\(p\)</span> columns with treatment assignments and baseline covariates.</li>
 <li><span class="math inline">\(\beta\)</span>: parameter vector of <span class="math inline">\(p\)</span> fixed effects.</li>
 <li><span class="math inline">\(\otimes\)</span>: Kronecker product.</li>
-<li><span class="math inline">\(\Sigma_{t \times t}\)</span>: residual covariance block</li>
-<li><span class="math inline">\(\Lambda_{t \times t}\)</span>: lower-triangular Cholesky factor of the residual correlation matrix.</li>
-<li><span class="math inline">\(\sigma_t\)</span>: residual standard deviation for visit <span class="math inline">\(t\)</span>.</li>
-<li><span class="math inline">\(s_\beta\)</span>, <span class="math inline">\(s_\sigma\)</span>, <span class="math inline">\(s_\lambda\)</span>: hyperparameters</li>
+<li><span class="math inline">\(\Sigma_{t \times t}\)</span>: residual covariance block (visits within patient)</li>
+<li><span class="math inline">\(\Lambda_{t \times t}\)</span>: lower-triangular Cholesky factor of the residual correlation matrix block (visits within patient).</li>
+<li><span class="math inline">\(\sigma = (\sigma_1, \ldots, \sigma_t)\)</span>, where <span class="math inline">\(\sigma_s\)</span> is the residual SD for visit <span class="math inline">\(s\)</span>.</li>
+<li><span class="math inline">\(s_\beta\)</span>, <span class="math inline">\(s_\sigma\)</span>, <span class="math inline">\(s_\lambda\)</span>: scalar hyperparameters</li>
 </ul>
 </div>
 </div>
