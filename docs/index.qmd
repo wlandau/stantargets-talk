@@ -387,6 +387,9 @@ graph LR
 :::: {.columns}
 ::: {.column width="70%"}
 ::: {.medium}
+
+* Bayesian longitudinal linear model of a continuous endpoint in a clinical trial:
+
 $$
 \begin{aligned}
 & y \sim \text{MVN}(X_{(n \cdot t) \times p} \beta, \ I_{n \times n} \otimes \Sigma_{t \times t} ) \\
@@ -396,8 +399,6 @@ $$
 & \qquad \qquad \Lambda_{t \times t}\Lambda_{t \times t}' \sim \text{LKJ}(\text{shape} = s_\lambda, \text{order} = t)
 \end{aligned} 
 $$
-
-* Used to analyze longitudinal clinical trial data.
 :::
 
 :::
