@@ -10,7 +10,6 @@ stores
 .RData
 .Rhistory
 .Rproj.user/
-docs
 inst/doc
 vignettes/*.html
 README.html
