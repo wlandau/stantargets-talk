@@ -37,7 +37,7 @@ simulate_data <- function(
   n_patient = 50,
   n_visit = 4,
   n_beta = 2,
-  n_missing = as.integer(0.1 * n_patient * n_visit),
+  n_missing = 0,
   s_beta = 1,
   s_sigma = 1,
   s_lambda = 1
@@ -73,4 +73,84 @@ simulate_data <- function(
       lambda = lambda
     )
   )
+}
+
+#' @title Get simulation-based calibration rank statistics.
+#' @export
+#' @description Run `SBC::calculate_ranks_draws_matrix()` to calculate
+#'   simulation-based calibration rank statistics on each model parameter.
+#' @references
+#'   Kim, Shinyoung, Hyunji Moon, Martin Modrák, and Teemu Säilynoja. 2022.
+#'     SBC: Simulation Based Calibration for Rstan/Cmdstanr Models.
+#'   Talts, Sean, Michael Betancourt, Daniel Simpson, Aki Vehtari,
+#'     and Andrew Gelman. 2020. "Validating Bayesian Inference Algorithms with
+#'     Simulation-Based Calibration." https://arxiv.org/abs/1804.06788.
+#' @return A data frame with one column per model parameter and a single
+#'   row with the rank statistics.
+#' @param data List of data for the Stan model.
+#' @param draws A data frame with one row per MCMC draw and one column
+#'   per model parameter.
+#' @examples
+#' library(dplyr)
+#' library(posterior)
+#' library(purrr)
+#' library(SBC)
+#' library(tibble)
+#' data <- simulate_data() # See above for the function definition.
+#' draws <- tibble(`beta[1]` = rnorm(100), `beta[2]` = rnorm(100))
+#' get_ranks(data = data, draws = draws)
+get_ranks <- function(data, draws) {
+  draws <- select(
+    draws,
+    starts_with(names(data$.join_data))
+  )
+  truth <- map_dbl(
+    .x = names(draws),
+    .f = ~eval(parse(text = .x), envir = data$.join_data)
+  )
+  out <- calculate_ranks_draws_matrix(
+    variables = truth,
+    dm = as_draws_matrix(draws)
+  )
+  as_tibble(as.list(out))
+}
+
+#' @title Plot simulation-based calibration rank statistics.
+#' @export
+#' @description Plot simulation-based calibration rank statistics.
+#' @details For most models, if the model is implemented correctly,
+#'   then the SBC rank statistics should be uniformly distributed
+#'   for each parameter.
+#' @references
+#'   Kim, Shinyoung, Hyunji Moon, Martin Modrák, and Teemu Säilynoja. 2022.
+#'     SBC: Simulation Based Calibration for Rstan/Cmdstanr Models.
+#'   Talts, Sean, Michael Betancourt, Daniel Simpson, Aki Vehtari,
+#'     and Andrew Gelman. 2020. "Validating Bayesian Inference Algorithms with
+#'     Simulation-Based Calibration." https://arxiv.org/abs/1804.06788.
+#' @return A data frame with one column per model parameter and a single
+#'   row with the rank statistics.
+#' @param ranks Data frame of SBC ranks from get_ranks()
+#' @param draws A data frame with one row per MCMC draw and one column
+#'   per model parameter.
+#' @examples
+#' library(dplyr)
+#' library(ggplot2)
+#' library(tidyr)
+#' ranks <- tibble(
+#'   `beta[1]` = runif(1e5, min = 0, max = 1e3),
+#'   `beta[2]` = runif(1e5, min = 0, max = 1e3)
+#' )
+#' plot_ranks(ranks = ranks, prefix = "beta")
+plot_ranks <- function(ranks, prefix) {
+  long <- ranks %>%
+    select(starts_with(prefix)) %>%
+    pivot_longer(
+      cols = everything(),
+      names_to = "parameter",
+      values_to = "rank"
+    )
+  ggplot(long) +
+    geom_histogram(aes(x = rank), bins = 15) +
+    facet_wrap(~parameter) +
+    theme_gray(12)
 }
