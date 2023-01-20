@@ -14,7 +14,8 @@ tar_option_set(
     "SBC",
     "tibble",
     "tidyr"
-  )
+  ),
+  deployment = "main"
 )
 tar_source()
 # For clustermq configuration with Slurm, see
@@ -32,11 +33,11 @@ list(
     iter_warmup = 2e3,
     iter_sampling = 2e3,
     transform = get_ranks, # Supply the transform to get SBC ranks.
-    format = "feather",
     memory = "transient",
     garbage_collection = TRUE,
     storage = "worker",
-    retrieval = "worker"
+    retrieval = "worker",
+    deployment = "worker"
   ),
   tar_target(beta, plot_ranks(analysis_model, "beta")),
   tar_target(sigma, plot_ranks(analysis_model, "sigma")),
