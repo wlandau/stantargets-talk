@@ -1,7 +1,7 @@
 functions {
 /**
-  * Compute the normal kernel of a multivariate normal density
-  *   on the log scale: `-0.5 * delta' * (LL')^{-1} * delta`,
+  * Compute the normal kernel of multiple observations from a multivariate normal density
+  *   on the log scale: `sum(-0.5 * delta' * (LL')^{-1} * delta) - 0.5 * cols(delta) * log(det(LL'))`,
   *   where L is the lower Cholesky factor of the covariance matrix,
   *   delta = `y - E(y)`, and y is the data vector.
   *   The expression `delta' * (LL')^{-1} * delta` factors into
