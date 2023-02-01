@@ -5,7 +5,7 @@
 # underlying parameter draws in posterior intervals.
 library(targets)
 library(stantargets)
-tar_option_set(packages = "dplyr")
+tar_option_set(packages = "dplyr", deployment = "main")
 tar_source()
 # For clustermq configuration with Slurm, see
 # https://books.ropensci.org/targets/hpc.html#clustermq-remote-configuration
@@ -30,7 +30,8 @@ list(
     memory = "transient",
     garbage_collection = TRUE,
     storage = "worker",
-    retrieval = "worker"
+    retrieval = "worker",
+    deployment = "worker"
   ),
   tar_target(
     name = convergence,

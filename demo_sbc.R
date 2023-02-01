@@ -16,8 +16,9 @@ tar_edit()
 # Inspect the pipeline.
 tar_visnetwork()
 
-# Run the pipeline with 2 persistent workers.
-# Takes a long time.
+# Run the pipeline with 2 persistent workers. First run takes a long time.
+# To increase computational power, visit
+# https://books.ropensci.org/targets/hpc.html
 tar_make_clustermq(workers = 2)
 
 # Plot the SBC rank statistics of the fixed effect parameters.
