@@ -110,7 +110,7 @@ knitr::opts_chunk$set(
 4. Use `tar_manifest()` and `tar_visnetwork()` to inspect the pipeline.
 5. Use `tar_make()` to run the pipeline.
 6. Inspect the results with `tar_read()` or `tar_load()`.
-7 Scale up the pipeline if you started small.
+7. Scale up the pipeline if you started small.
 
 ## Example pipeline
 
