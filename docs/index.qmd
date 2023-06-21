@@ -47,6 +47,10 @@ knitr::opts_chunk$set(
 
 ## Demanding computation in R {.smaller}
 
+:::: {.columns}
+
+::: {.column width="35%"}
+
 * **Bayesian data analysis: Stan, JAGS, NIMBLE, `greta`**
 * Deep learning: `keras`, `tensorflow`, `torch`
 * Machine learning: `tidymodels`
@@ -57,6 +61,18 @@ knitr::opts_chunk$set(
 * Permutation tests
 * Database queries: `DBI`
 * Big data ETL
+
+:::
+
+::: {.column width="65%"}
+
+![](./images/bayesian-workflow.png)
+
+* <https://arxiv.org/abs/2011.01808>
+
+:::
+
+::::
 
 ## Typical notebook-based project
 
@@ -471,10 +487,11 @@ $$
 * Bürkner P, Gabry J, Kay M, Vehtari A (2022). "posterior: Tools for Working
   with Posterior Distributions." R package version 1.3.1,
   <https://mc-stan.org/posterior/>.
-* Cook, Samantha R., Andrew Gelman, and Donald B. Rubin. 2006. “Validation of Software for Bayesian Models Using Posterior Quantiles.” Journal of Computational and Graphical Statistics 15 (3): 675–92. <http://www.jstor.org/stable/27594203>.
+* Cook, Samantha R., Andrew Gelman, and Donald B. Rubin (2006). “Validation of Software for Bayesian Models Using Posterior Quantiles.” Journal of Computational and Graphical Statistics 15 (3): 675–92. <http://www.jstor.org/stable/27594203>.
 * Gabry, J., & Češnovar, R. (2021). "Cmdstanr: R interface to CmdStan". <https://mc-stan.
 org/cmdstanr>.
-* Kim, Shinyoung, Hyunji Moon, Martin Modrák, and Teemu Säilynoja. 2022. "SBC: Simulation Based Calibration for Rstan/Cmdstanr Models."
+* Gelman, A., Aki Vehtari, Daniel Simpson, Charles C. Margossian, Bob Carpenter, Yuling Yao, Lauren Kennedy, Jonah Gabry, Paul-Christian Bürkner, and Martin Modrák (2020). "Bayesian Workflow". arXiv, <https://arxiv.org/abs/2011.01808>.
+* Kim, Shinyoung, Hyunji Moon, Martin Modrák, and Teemu Säilynoja (2022). "SBC: Simulation Based Calibration for Rstan/Cmdstanr Models."
 * Landau, W. M. (2021). "The targets R package: A dynamic make-like function-oriented
 pipeline toolkit for reproducibility and high-performance computing." Journal of Open
 Source Software, 6(57), 2959. <https://doi.org/10.21105/joss.02959>
@@ -483,4 +500,4 @@ Source Software, 6(57), 2959. <https://doi.org/10.21105/joss.02959>
   of Open Source Software, 6(60), 3193, <https://doi.org/10.21105/joss.03193>.
 * Stan Development Team. (2012). "Stan: A C++ library for probability and sampling." <https:
 //mc-stan.org>
-* Talts, Sean, Michael Betancourt, Daniel Simpson, Aki Vehtari, and Andrew Gelman. 2020. "Validating Bayesian Inference Algorithms with Simulation-Based Calibration." <https://arxiv.org/abs/1804.06788>.
+* Talts, Sean, Michael Betancourt, Daniel Simpson, Aki Vehtari, and Andrew Gelman (2020). "Validating Bayesian Inference Algorithms with Simulation-Based Calibration." <https://arxiv.org/abs/1804.06788>.
