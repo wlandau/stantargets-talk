@@ -148,37 +148,9 @@ list(
 )
 ```
 
-## Example usage {.smaller}
+## Visualization {.smaller}
 
-<br>
-
-:::: {.columns}
-
-::: {.column width="40%"}
-
-```{r, eval = FALSE, echo = TRUE}
-tar_outdated()
-#> [1] "plot"
-
-tar_make()
-#> ✔ skip target file
-#> ✔ skip target data
-#> ✔ skip target model
-#> ✔ skip target summary
-#> • start target plot
-#> • built target plot
-#> • end pipeline: 0.501 seconds
-
-tar_read(plot)
-```
-
-![](./images/plot2.png)
-
-:::
-
-::: {.column width="60%"}
-
-* `tar_mermaid()` graph:
+`tar_mermaid()` graph:
 
 ```{mermaid}
 %%| fig-width: 5.5
@@ -209,9 +181,25 @@ graph LR
 * See also `tar_visnetwork()`.
 * Details: <https://wlandau.github.io/targets-intro>. 
 
-:::
+## Example usage {.smaller}
 
-::::
+```{r, eval = FALSE, echo = TRUE}
+tar_outdated()
+#> [1] "plot"
+
+tar_make()
+#> ✔ skip target file
+#> ✔ skip target data
+#> ✔ skip target model
+#> ✔ skip target summary
+#> • start target plot
+#> • built target plot
+#> • end pipeline: 0.501 seconds
+
+tar_read(plot)
+```
+
+![](./images/plot2.png)
 
 ## Parallel computing (1/2) {.smaller}
 
@@ -444,6 +432,9 @@ $$
 & \qquad \qquad \Lambda_{t \times t}\Lambda_{t \times t}' \sim \text{LKJ}(\text{shape} = s_\lambda, \text{order} = t)
 \end{aligned} 
 $$
+
+* Special case of a mixed model of repeated measures (MMRM; Mallinckrodt et al. 2008).
+
 :::
 
 :::
@@ -498,6 +489,7 @@ Source Software, 6(57), 2959. <https://doi.org/10.21105/joss.02959>
 * Landau, W. M., (2021). "The stantargets R package: a workflow framework for
   efficient reproducible Stan-powered Bayesian data analysis pipelines." Journal
   of Open Source Software, 6(60), 3193, <https://doi.org/10.21105/joss.03193>.
+* Mallinckrodt, C. H., Lane, P. W., Schnell, D., Peng, Y., Mancuso, J. P. (2008). "Recommendations for the primary analysis of continuous endpoints in longitudinal clinical trials." Drug information journal, 42, 303-319.
 * Stan Development Team. (2012). "Stan: A C++ library for probability and sampling." <https:
 //mc-stan.org>
 * Talts, Sean, Michael Betancourt, Daniel Simpson, Aki Vehtari, and Andrew Gelman (2020). "Validating Bayesian Inference Algorithms with Simulation-Based Calibration." <https://arxiv.org/abs/1804.06788>.
